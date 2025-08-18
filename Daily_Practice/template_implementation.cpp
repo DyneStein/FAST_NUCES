@@ -6,7 +6,6 @@ class Matrix
 {
 private:
     T** matrix;
-
 public:
     // Constructor: allocate dynamic 2D array
     Matrix() {
