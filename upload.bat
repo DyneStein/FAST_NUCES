@@ -4,7 +4,11 @@ echo       GitHub Daily Upload Script
 echo ========================================
 echo.
 
-:: Stage all changes (new, modified, and deleted files)
+:: Automatically track empty folders by adding a dummy file to them.
+echo Preparing folders (checking for empty ones)...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Directory -Recurse -Force | Where-Object { $_.FullName -notmatch '\\.git' -and @(Get-ChildItem -Path $_.FullName -Force).Count -eq 0 } | ForEach-Object { New-Item -ItemType File -Path (Join-Path $_.FullName '.gitkeep') -Force }"
+
+:: Stage all changes (new files, modified files, deleted files, and empty folders)
 git add .
 
 :: Prompt for a commit message (optional)
