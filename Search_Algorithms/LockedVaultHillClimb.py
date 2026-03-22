@@ -48,6 +48,7 @@ def cost(state, goal):
 #    return total
 
 
+#Steepest Ascent
 def hillClimb(initial, target):
     while True:
         current_state = initial

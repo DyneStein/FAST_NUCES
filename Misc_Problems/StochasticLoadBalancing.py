@@ -44,7 +44,7 @@ def generate_neighbours(state):
     return neighbours
 
 
-
+#Stochastic HillClimb
 def StochasticHillClimbing(state,SC):
     i = 100
     #iteration wise because stochastic does not stops conventionally

@@ -25,8 +25,8 @@ def cost(A,B):
 
 def generate_neighbours(allocation):
     neighbours = []
-    for i in range(len(allocation)):
-        for j in range(len(allocation)):
+    for i in range(len(allocation)-1):
+        for j in range(i+1,len(allocation)):
             nb = []
             for k in range(len(allocation)):
                 nb.append(allocation[k])
@@ -36,7 +36,7 @@ def generate_neighbours(allocation):
             neighbours.append(nb)
     return neighbours
 
-
+#Steepest Ascent
 def hillClimb(allocation):
 
     while True:
@@ -44,8 +44,6 @@ def hillClimb(allocation):
         current_cost = cost(allocation,CapPerServer)
 
         temp = current_allocation.copy() # just to be safe for comparison if mutation occurs
-        
-        
         
         for nb in generate_neighbours(current_allocation):
             if cost(nb,CapPerServer) < current_cost:
@@ -58,7 +56,5 @@ def hillClimb(allocation):
             print(f"Final allocation is : {[int(x) for x in current_allocation]}")
             print(f"The cost is : {current_cost}")
             break
-
-
 
 hillClimb(CurrentProcessesPerServer)
