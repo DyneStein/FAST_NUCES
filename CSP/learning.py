@@ -27,6 +27,8 @@ neighbours = {
 def constraint(VarA, ValueOfVarA, VarB, ValueOfVarB):
     return ValueOfVarA != ValueOfVarB #so this is the constraint that varA and varB should not have same values and it should be satisfied
 
+
+#Unassigned 
 #MRV --> minimum Remaining Value, basically returns that UNASSIGNED variable which has the minimum AMOUNT of LEGAL values (i.e does not violate any constraint with already-assigned variables) in its DOMAIN
 #when there is a tie, MRV uses degree heuristic to select the one which has greater degree (i.e more neighbours)
 def MRV(Current_assignment, domains):
@@ -74,6 +76,8 @@ def LCV(var,domains):
 
     return values
 
+
+#Unassigned 
 #FC--> domain pruning for neighbour variables the specific value selected from LCV and specific variable comming from MRV
 def FC(var, value, domains , assignment):
     new_domain = copy.deepcopy(domains)
@@ -109,10 +113,49 @@ def FC(var, value, domains , assignment):
 #thats why in AC3 we removes values from original domain
 
 
+
+
+"""
+
+# THE PROBLEM: Modifying a list while looping over it
+
+domains["SA"] = ["Red", "Green", "Blue"]
+
+# WITHOUT [:]  ← BUGGY
+for value in domains["SA"]:        # loop uses the SAME list
+    domains["SA"].remove(value)    # shrinking the same list mid-loop
+
+# Step 1: pointer at index 0 → value = "Red"   → remove "Red"
+# list is now ["Green", "Blue"]
+# Step 2: pointer at index 1 → value = "Blue"  → "Green" was SKIPPED!
+# Step 3: loop ends (only 2 items left, pointer goes out)
+
+print(domains["SA"])  # ["Green"]  ← Green was never checked! BUG
+
+
+# ─────────────────────────────────────────────
+
+# WITH [:]  ← CORRECT
+domains["SA"] = ["Red", "Green", "Blue"]  # reset
+
+for value in domains["SA"][:]:     # loop walks a FROZEN COPY ["Red","Green","Blue"]
+    domains["SA"].remove(value)    # modifies the ORIGINAL, loop is unaffected
+
+# Step 1: copy says index 0 = "Red"   → remove "Red"   from original
+# Step 2: copy says index 1 = "Green" → remove "Green" from original
+# Step 3: copy says index 2 = "Blue"  → remove "Blue"  from original
+
+print(domains["SA"])  # []  ← all values were visited correctly
+
+"""
+
+
+
+
 def revise(Xi, Xj, domains):
     revised = False
 
-    for Xi_value in domains[Xi]:
+    for Xi_value in domains[Xi][:]:
 
         found = False
 
@@ -386,25 +429,88 @@ def backtrack(assignment, domains, method):
 
 
 """
+#During MRV, if there is a tie, then pick the variable with higher degree... (Degree Hueristic)
 
 
-
-"""
-my questions and doubts: why are we not checking the legality (I mean whether the unassigned variable we are selecting in mrv function also contains the values which are not consistent or breaks the constraint) ... so why are not we checking that thing, it may be taking into account those values because it counts the whole domain and in the algorithm we are checking the validity of values after MRV ? .... 2- the domains dict which we make initially ,  we had already performed cleaning based on unary constraints for that domain right ? 3- In FC , 
-            #why this (this would even return for asingle neighbour) ?
-            if len(valid) == 0:
-                return None   .... why ? 4- why are we making a new fresh domain in FC, like assume we are in a row assigning the third variable values , so the  domain till now have been changed from because of the previous two variables and then the FC runs for this third variable and its specific value and we unintentionally or idk retrieve all the values which we gone because of other constriants to this domain for this specific variable ig ? like this is a bit confusing like I want dry run for this please.... 5- Is ARC-consistency AC3 ? like what are these names please explain me names for ARC , K and like stuff because I do not want to get confused in exam and potentially apply the wrong algorithm ..... 6- 
-"""
+#NOTES made with AI
 
 
+# ============================================================
+# AC-3 (Arc Consistency 3) - Complete Notes
+# ============================================================
 
+# WHAT IS AC-3?
+# AC-3 is a constraint propagation algorithm used in Constraint
+# Satisfaction Problems (CSPs). It enforces arc consistency by
+# pruning values from variable domains that cannot possibly be
+# part of any valid solution.
 
+# ------------------------------------------------------------
+# INITIAL SETUP
+# ------------------------------------------------------------
+# - AC-3 starts by pushing all arcs in both directions into a queue.
+# - For every constrained pair (X, Y), both (X, Y) and (Y, X) are added.
+# - This means every variable-pair relationship is checked from both sides.
 
+# ------------------------------------------------------------
+# THE REVISE STEP - CORE LOGIC
+# ------------------------------------------------------------
+# For each arc (X, Y) popped from the queue:
+# - Go through every value vx in X's domain.
+# - Check if there is at least one value vy in Y's domain that satisfies the constraint.
+# - If no value in Y is consistent with vx, remove vx from X's domain.
+# - This is called "revising" the arc.
 
+# ------------------------------------------------------------
+# RE-ADDING NEIGHBORS (PROPAGATION)
+# ------------------------------------------------------------
+# - After processing arc (X, Y), ONLY IF X's domain shrank,
+#   re-add arcs (Z, X) for every neighbor Z of X, excluding Y.
+# - If X's domain did NOT shrink, nothing changed so no need to re-check neighbors.
+# - This propagation is what makes AC-3 powerful.
+#   A change in one variable ripples through the network.
 
+# ------------------------------------------------------------
+# TERMINATION CONDITIONS
+# ------------------------------------------------------------
+# AC-3 stops under two conditions:
+# - FAILURE : A domain becomes empty -> return failure, no solution exists.
+# - SUCCESS : The queue becomes empty with all domains non-empty
+#             -> arc consistency achieved.
 
+# ------------------------------------------------------------
+# THE 3 POSSIBLE OUTCOMES
+# ------------------------------------------------------------
+# 1. A domain becomes empty
+#    Meaning  : No solution exists.
+#    Next Step: Return failure immediately.
+#
+# 2. All domains have exactly 1 value
+#    Meaning  : Unique solution found directly.
+#    Next Step: Done, read off the solution.
+#
+# 3. Some domains still have 2+ values
+#    Meaning  : Inconclusive, ambiguity remains.
+#    Next Step: Run backtracking search on the pruned domains.
 
+# ------------------------------------------------------------
+# IMPORTANT LIMITATION
+# ------------------------------------------------------------
+# - AC-3 is NOT a complete solver. It is a filter/pruning step.
+# - It checks pairs of variables in isolation,
+#   NOT combinations of 3 or more simultaneously.
+# - So even if arc consistency is achieved,
+#   a global solution may or may not exist.
+# - In practice, AC-3 is used inside backtracking search.
+#   This combination is called MAC (Maintaining Arc Consistency).
+# - After every variable assignment during search,
+#   AC-3 is re-run to prune domains further.
 
+# ------------------------------------------------------------
+# KEY TAKEAWAY
+# ------------------------------------------------------------
+# AC-3 reduces the search space by eliminating obviously inconsistent values,
+# but it cannot always solve the problem on its own.
+# The real power comes from combining it with backtracking search.
 
-
-
+# ============================================================
