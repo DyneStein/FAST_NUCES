@@ -403,6 +403,8 @@ def order_crossover_manual(parent_a, parent_b):
     # STEP 3 read parent B circularly
     b_index = cut2 + 1
     child_index = 0
+    #this is not standard broooo ... yet it generate correctly however, child_index should also start from cut2+1....it is the standard OX1
+    
 
     while None in child:
 

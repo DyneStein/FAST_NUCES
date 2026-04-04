@@ -16,6 +16,9 @@ for i in range(5):
 def initial_population_generator(pop_size):
     pop = []
     cities = list(range(1,5))
+    print("dakjnsjnds") #total cities - 2 ... so for example we have total 5 cities and tum ne kisi aik se start lena starting city + remainging ciies = lets say 5(inclusive of starting), now you also have to get to that starting right! so add one , 5+1 = 6 cities total including starting and ending which is basically the same city so subtract them both so total 6 - 2 = 4 is basically the amount of cities other than the starting / ending one you have to have and make a list and generate populations....
+    print(cities)
+    print("")
     temp = cities[:]
     for i in range(pop_size):
         #majorFix1
@@ -26,6 +29,9 @@ def initial_population_generator(pop_size):
 
     return pop
 
+
+
+#generally kisi ne agr likha hua hai in exam that C5,C4,C2,C1,C6,C3 is ka matlab implicit hai ke this complete list includes the starting city which is C5 but NOT THE ENDING CITY which is also C5 but not included so in cost calculation keep this thing in mind... 
 
 
 def cost(chromosome,grid):
